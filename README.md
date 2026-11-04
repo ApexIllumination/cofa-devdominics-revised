@@ -54,6 +54,8 @@ CORE는 선택 기준만 안내한다. 여섯 스킬을 전부 읽거나 실행�
 | 업무 규칙·예외 | [decision-rules](skills/decision-rules/SKILL.md) |
 | 현업 질문으로 목적·판단·데이터 의미를 확인해야 함 | [공용 질의응답 참조](skills/task-scope/references/stakeholder-elicitation.md) |
 | 데이터·도구 입출력 | [tool-contracts](skills/tool-contracts/SKILL.md) |
+| React 조회 버튼·세션 만료·재시도 | [API 요청 모듈](templates/web-request/README.md) |
+| 로그인부터 계정 전환까지 실제 앱 점검 | [웹 통합 점검 모듈](templates/web-smoke/README.md) |
 | 실제 결과 대조 | [verify-results](skills/verify-results/SKILL.md) |
 | 중단·재개 | [session-handoff](skills/session-handoff/SKILL.md) |
 | 기술·구현 원리 설명과 설명 연습 | [explain-work](skills/explain-work/SKILL.md) |

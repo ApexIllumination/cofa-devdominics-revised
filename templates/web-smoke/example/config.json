@@ -1,0 +1,9 @@
+{
+  "resource": "/api/item",
+  "logout": "/api/logout",
+  "retryLabel": "다시 시도",
+  "accounts": [
+    {"id": "alice", "password": "demo", "result": "ALPHA-17"},
+    {"id": "bob", "password": "demo", "result": "BRAVO-42"}
+  ]
+}

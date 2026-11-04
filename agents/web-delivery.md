@@ -4,6 +4,8 @@
 
 로그인이 필요하면 과제의 기존 인증부터 확인한다. 자체 세션이 필요한 단일 프로세스 Python 데모에는 [로그인 템플릿과 API 계약](../templates/session-login/README.md)을 백엔드와 프론트에 함께 전달한다.
 
+React에서 같은 출처 API를 조회할 때는 프론트 담당에게 [요청·재시도 모듈](../templates/web-request/README.md)을, 세션이 있는 앱의 통합 담당에게는 [두 계정으로 점검하는 절차](../templates/web-smoke/README.md)를 전달한다. 기존 구현이 있으면 점검만 재사용한다.
+
 ## 구현 위임
 
 | 담당 | 시작할 때 받는 것 | 자율적으로 끝낼 일 |
