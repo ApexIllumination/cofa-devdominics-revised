@@ -1,0 +1,56 @@
+[
+  {
+    "name": "impeccable",
+    "repository": "pbakaus/impeccable",
+    "commit": "f864521bbb1c9350e8f6cf7742c139a04a1020af",
+    "path": ".agents/skills/impeccable/SKILL.md"
+  },
+  {
+    "name": "state-machine",
+    "repository": "jakubkrehel/skills",
+    "commit": "60bf140e43c98b248e6594487384ec967e89d98a",
+    "path": "skills/state-machine/SKILL.md"
+  },
+  {
+    "name": "shadcn",
+    "repository": "shadcn-ui/ui",
+    "commit": "8a3536678a528cc012b9e62484290e79d0be410f",
+    "path": "skills/shadcn/SKILL.md"
+  },
+  {
+    "name": "review-animations",
+    "repository": "emilkowalski/skills",
+    "commit": "f1090bec277140d02ed202440185ad9d02ac1490",
+    "path": "skills/review-animations/SKILL.md"
+  },
+  {
+    "name": "design-checklist",
+    "repository": "Superfuture/design-review",
+    "commit": "d4d2609b53fccb475d11490e2c6261e5eb2f0c5d",
+    "path": "design-review/skills/design-review/checklist.md"
+  },
+  {
+    "name": "accessibility",
+    "repository": "addyosmani/web-quality-skills",
+    "commit": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
+    "path": "skills/accessibility/SKILL.md"
+  },
+  {
+    "name": "screen-reader-testing",
+    "repository": "wshobson/agents",
+    "commit": "7e2fb559cf4b824b27f1fec49fe88f7511066d26",
+    "path": "plugins/accessibility-compliance/skills/screen-reader-testing/SKILL.md"
+  },
+  {
+    "name": "webapp-testing",
+    "repository": "anthropics/skills",
+    "commit": "ca45fc496a3436251f191354091d557da31c15b5",
+    "path": "skills/webapp-testing/SKILL.md"
+  },
+  {
+    "name": "editorial-portfolio-chapters",
+    "repository": "MengTo/Skills",
+    "commit": "1de14e21b2ba8937c0f7f6ddca581cf7cd9d94af",
+    "path": "agent-skills/web-design/editorial-portfolio-chapters/SKILL.md"
+  }
+]

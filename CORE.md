@@ -31,6 +31,7 @@
 | 새 과제·성공 조건·범위 변경 | [task-scope](skills/task-scope/SKILL.md) | 문제·범위·수용 조건 정의 |
 | 업무 기준·예외·우선순위 | [decision-rules](skills/decision-rules/SKILL.md) | 규칙·검증 사례 명세 |
 | 도구 경계·입출력·접근 오류 | [tool-contracts](skills/tool-contracts/SKILL.md) | 도구 계약·단독 검증 |
+| 새 UI·컴포넌트 상태·화면 접근성 | [외부 UI 스킬 선택](integrations/ui-tools.md) | 필요한 화면의 디자인을 검토하고 실제 조작 검증으로 연결 |
 | 정확성·전체 흐름·회귀 확인 | [verify-results](skills/verify-results/SKILL.md) | 결과 대조·검증 판정 |
 | 세션 전환·중단·재개 | [session-handoff](skills/session-handoff/SKILL.md) | 같은 상태의 갱신·재확인 |
 | 기술·구현 원리 설명 요청 또는 합의한 이해 점검 | [explain-work](skills/explain-work/SKILL.md) | 사례로 원리 설명 · 연습 시 실제 구현과 대조 |

@@ -1,10 +1,10 @@
-# cofa-kit-revised
+# cofa-devdominics-revised
 
 구현을 설명할 때는 화면에서 사용자가 한 행동과 그 직후 보이는 변화로 시작한다. 같은 장면을 따라가며 변화가 생긴 이유를 설명하고, 마지막 줄에 실제 코드 흐름을 한 줄로 정리한다.
 
 ## 바로 시작하기
 
-Clone 후 제공된 Codex에 **“cofa-kit-revised/README.md를 읽고 시작해 줘”**라고 요청한다. 폴더명이 다르면 실제 경로로 바꾼다.
+Clone 후 제공된 Codex에 **“cofa-devdominics-revised/README.md를 읽고 시작해 줘”**라고 요청한다. 폴더명이 다르면 실제 경로로 바꾼다.
 
 사용자가 이 kit를 적용해 작업을 시작하도록 요청했다면 다음 지침을 따른다. 단순 설명·검토 요청이면 그 요청 범위만 수행한다.
 
@@ -18,18 +18,29 @@ Clone 후 제공된 Codex에 **“cofa-kit-revised/README.md를 읽고 시작해
 
 배포자는 이 패키지의 내용만 별도 공개 저장소의 루트에 올리고 URL을 안내한다. 사용자는 제공 환경 안에서 공개 저장소를 Clone하거나 허용된 다운로드 경로로 가져온다. 개인 PC 파일 업로드는 사용하지 않는다. 2026 SK하이닉스 Cofa 2차 예선에 적용할 때는 [시험 적용 규칙](EXAM.md)을 확인한다.
 
-아래는 제공 환경의 터미널에서 실행하는 예다. `COFA_PUBLIC_REPO_URL`에 확인한 공개 저장소 URL을 먼저 설정하고, `cofa-kit-revised`이라는 폴더가 이미 있다면 다른 새 이름을 사용한다.
+제공 환경의 터미널에서 아래 명령으로 받는다. 새 디렉터리 이름을 지정하면 뒤의 명령에서도 그 경로를 사용한다.
 
 ```sh
-: "${COFA_PUBLIC_REPO_URL:?확인한 공개 저장소 URL을 먼저 설정하세요}"
-git clone --depth 1 "$COFA_PUBLIC_REPO_URL" cofa-kit-revised
+git clone --depth 1 https://github.com/ApexIllumination/cofa-devdominics-revised.git
 ```
 
 Clone할 수 없으면 제공 환경의 허용된 다운로드 방식이나 Cofa Helper 안내를 따른다. 차단·업로드 제한을 다른 경로로 우회하지 않는다. 가져오기만으로 스킬·hook·MCP가 자동 등록되지는 않는다.
 
+## 웹 과제의 디자인 자료 자동 준비
+
+이 README를 읽고 작업을 시작한 에이전트는 과제에 웹 화면 디자인이 포함되어 있고 공개 도구 다운로드가 허용되면 아래 명령을 한 번 실행한다. 사용자가 미리 준비하라고 했을 때도 같은 명령을 쓴다. kit 폴더명은 실제 경로에 맞춘다.
+
+```sh
+python3 cofa-devdominics-revised/scripts/prepare_design.py
+```
+
+[고정 버전 목록](integrations/design-sources.json)에 있는 9개 자료가 kit 안의 `.design-tools/`에 저장된다. 출력된 경로 중 [UI 선택표](integrations/ui-tools.md)에 맞는 파일만 읽는다. 재실행하면 이미 받은 버전은 재사용한다. 일부 다운로드가 막히면 준비된 자료로 계속한다. Impeccable 실행 엔진, shadcn 컴포넌트와 브라우저 같은 별도 런타임의 사용 가능 여부는 해당 기능이 필요할 때 확인한다.
+
 ## 스킬 선택
 
 CORE는 선택 기준만 안내한다. 여섯 스킬을 전부 읽거나 실행할 필요는 없다. 자동 발견 기능이 확인되지 않은 환경에서는 해당 `SKILL.md`의 경로를 지정하면 된다. 같은 스킬의 여러 사본을 동시에 등록하지 않는다.
+
+웹 화면을 설계하거나 다듬을 때는 [외부 UI 스킬 선택표](integrations/ui-tools.md)를 따른다. 프로젝트에서 사용할 수 있는 외부 스킬을 필요한 화면에만 적용한다.
 
 ## 필요할 때만 사용하는 파일
 
@@ -48,7 +59,7 @@ CORE는 선택 기준만 안내한다. 여섯 스킬을 전부 읽거나 실행�
 | JSON 결과의 수정 제안을 검토하고 사람의 결정 후 재검증 | [result-review agent](agents/result-review.md), [review_agent.py](scripts/review_agent.py) |
 | 기존 상태 문서가 없을 때의 빈 양식 | [task-state.md](templates/task-state.md) |
 
-CLI 보조 도구는 Python 3.9 이상과 표준 라이브러리만 사용한다. CLI가 필요할 때만 `python3 --version`과 해당 스크립트의 `--help`로 확인한다. 선택적 `review_agent.py review`는 설치된 Codex CLI를 호출하므로 해당 환경의 모델 이용 권한·연결과 사용량을 사용한다. 네이티브 hook·Computer Use·설치 자동화는 포함하지 않는다. 보조 도구가 지원되지 않아도 지침을 읽고 제공된 도구로 작업할 수 있다.
+CLI 보조 도구는 Python 3.9 이상과 표준 라이브러리만 사용한다. CLI가 필요할 때만 `python3 --version`과 해당 스크립트의 `--help`로 확인한다. 선택적 `review_agent.py review`는 설치된 Codex CLI를 호출하므로 해당 환경의 모델 이용 권한·연결과 사용량을 사용한다. 디자인 자료 준비는 공개 파일을 내려받는 용도다. 보조 도구가 지원되지 않아도 지침을 읽고 제공된 도구로 작업할 수 있다.
 
 ## 선택적 결과 검토 agent
 
@@ -58,8 +69,14 @@ CLI 보조 도구는 Python 3.9 이상과 표준 라이브러리만 사용한다
 
 > `agents/result-review.md`를 참고해 이 결과를 검토해 줘. 기존 요구와 입력을 바탕으로 계약과 checker를 준비하고, checker가 정상 결과와 오답을 구분하는지 먼저 확인해 줘. 결과 검사 → 문제 분류 → 수정 제안까지 진행한 뒤 내 결정을 기다려. 내가 승인한 제안만 적용하고 재검증해 줘.
 
-현재 대화의 Codex가 `inspect` 결과를 읽어 제안을 작성하면 별도 모델 호출은 필요 없다. `review` 명령은 같은 제안 단계를 로컬 Codex 호출 한 번으로 수행하는 선택지다. 각 명령은 `python3 cofa-kit-revised/scripts/review_agent.py ...`로 실행한다. 계약·checker의 준비 비용은 별도로 들며, checker 통과는 그 검사 범위에 대한 결과다.
+현재 대화의 Codex가 `inspect` 결과를 읽어 제안을 작성하면 별도 모델 호출은 필요 없다. `review` 명령은 같은 제안 단계를 로컬 Codex 호출 한 번으로 수행하는 선택지다. 각 명령은 `python3 cofa-devdominics-revised/scripts/review_agent.py ...`로 실행한다. 계약·checker의 준비 비용은 별도로 들며, checker 통과는 그 검사 범위에 대한 결과다.
 
 사람에게 제안의 근거·변경 내용·남은 위험을 보여 주고 승인 또는 거절을 받은 뒤 `decide`에 기록한다. 모델이 사람의 결정을 추정해 `--actor human`으로 기록해서는 안 된다. 승인 뒤 원본·입력·제안이 달라지면 중단하며, 재검증 실패 시 대상 JSON을 복원한다. `human` 표시는 본인 인증이 아닌 기록이고, checker나 다른 파일의 부작용까지 복구하는 도구는 아니다. 상세 계약과 명령은 [agent 사용법](agents/result-review.md)을 따른다.
 
 `templates/`는 현재 과제 기록이나 실행 가능한 정답이 아닌 양식이다. 파일명과 `.cofa/` 디렉터리는 제안이며 공식 제출 규격이 아니다. 실제 과제의 필수 파일·경로를 우선한다. 배포본의 `MANIFEST.json`은 파일 목록과 SHA-256을 제공하며 서명이나 공식 승인 증명은 아니다.
+
+검사·현업 질문·수정 제안·종료 중 다음 행동을 고르려면 [다음 행동 에이전트](agents/next-action.md)를 사용한다. 호출자는 가능한 행동과 관측 결과를 제공한다.
+
+현업 답변과 본인의 결정·버린 대안·실제 검증을 나중에 함께 확인하려면 [결정 기록 CLI와 선택적 MCP](agents/decision-log.md)를 사용한다.
+
+과거 PASS를 현재 판단에 쓸 때는 [결정 저널의 current 검사](agents/decision-log.md#과거-통과의-현재-유효성)로 현재 입력·구현·관련 현업 답변 버전을 대조한다.
