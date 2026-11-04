@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "normal",
+      "kind": "normal",
+      "description": "설명용 예시다. 실제 실행 명령·입력·기대값으로 교체한다",
+      "command": ["{python}", "app.py", "--input", "fixtures/normal.json"],
+      "inputs": ["fixtures/normal.json"],
+      "expect": {"returncode": 0, "stdout": {"json": [{"pointer": "/status", "equals": "ok"}]}}
+    },
+    {
+      "id": "missing-input",
+      "kind": "missing",
+      "description": "필수 정보 누락 시 기대하는 실제 동작으로 교체한다",
+      "command": ["{python}", "app.py", "--input", "fixtures/missing.json"],
+      "inputs": ["fixtures/missing.json"],
+      "expect": {"returncode": 2, "stdout": {"json": [{"pointer": "/status", "equals": "needs_input"}]}}
+    },
+    {
+      "id": "critical-exception",
+      "kind": "critical-rule",
+      "description": "과제의 핵심 예외 규칙을 확인하는 실제 사례로 교체한다",
+      "command": ["{python}", "app.py", "--input", "fixtures/exception.json"],
+      "inputs": ["fixtures/exception.json"],
+      "expect": {"returncode": 0, "stdout": {"json": [{"pointer": "/classification", "equals": "review"}]}}
+    }
+  ]
+}

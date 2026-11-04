@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "purpose": "실제 과제의 목적을 작성하고 아래 예시 파일 경로를 교체한다",
+  "entry_points": [
+    {"path": "app.py", "description": "실제 실행 진입점과 역할로 교체"}
+  ],
+  "flows": [
+    {"name": "핵심 입력에서 결과까지", "steps": [
+      {"path": "app.py", "symbol": "main", "description": "실제 처리 흐름으로 교체"}
+    ]}
+  ],
+  "dependencies": [],
+  "commands": {"run": [], "verify": []},
+  "watch": {
+    "include": ["**/*.py", "**/*.js", "**/*.ts", "**/*.tsx", "**/*.json", "**/*.toml", "**/*.yaml", "**/*.yml", "**/*.sql", "**/*.html", "**/*.css"],
+    "exclude": ["out/**", "dist/**", "build/**", "coverage/**", "fixtures/**"]
+  }
+}
