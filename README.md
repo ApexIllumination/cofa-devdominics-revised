@@ -53,6 +53,7 @@ CORE는 선택 기준만 안내한다. 여섯 스킬을 전부 읽거나 실행�
 | 과제 범위·성공 조건 | [task-scope](skills/task-scope/SKILL.md) |
 | 업무 규칙·예외 | [decision-rules](skills/decision-rules/SKILL.md) |
 | 현업 질문으로 목적·판단·데이터 의미를 확인해야 함 | [공용 질의응답 참조](skills/task-scope/references/stakeholder-elicitation.md) |
+| CSV·JSON 입력과 기준표 결합 진단 | [실행 예시와 판독법](skills/tool-contracts/references/data-contract.md#csvjson-진단-실행) |
 | 데이터·도구 입출력 | [tool-contracts](skills/tool-contracts/SKILL.md) |
 | React 조회 버튼·세션 만료·재시도 | [API 요청 모듈](templates/web-request/README.md) |
 | 로그인부터 계정 전환까지 실제 앱 점검 | [웹 통합 점검 모듈](templates/web-smoke/README.md) |
