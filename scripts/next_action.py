@@ -6,6 +6,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+from decision_log import check_current
+
 KINDS = {"counterexample", "question", "proposal", "stop"}
 GUIDANCE = """Select the cheapest next observation that could change the decision.
 Separate observed behavior, intended policy and an implementation defect.
@@ -36,7 +38,7 @@ def make_prompt(context, actions, guided=True):
             + json.dumps({"context": context, "actions": actions}, ensure_ascii=False))
 
 
-def route_comparison(comparison, actions):
+def route_comparison(comparison, actions, fresh=False):
     """Narrow capabilities using evidence supplied by the host, never the model."""
     stop = next(a for a in actions if a["kind"] == "stop")
     case = comparison.get("input_id") if isinstance(comparison, dict) else None
@@ -56,9 +58,23 @@ def route_comparison(comparison, actions):
             raise ValueError(f"{name} requires a canonical result and source")
         return record["value"]
 
+    journal = comparison.get("journal")
     observed, expected = result("observed"), result("expected")
+    if "journal" in comparison:
+        if fresh or not isinstance(journal, dict):
+            raise ValueError("choose either fresh evidence or a journal reference")
+        audit = check_current(journal["db"], journal["decision_id"], journal["check_id"],
+                              case, journal["revision"], journal["rules"])
+        if audit["reuse_pass"]:
+            return [stop], f"Current journal PASS for {case}: {audit['event_id']}."
+        observed = None
+        probe_reason = f"Journal {audit['status']}: {audit['reason']}. Recheck {case}."
+    else:
+        if not fresh:
+            observed = None
+        probe_reason = f"Observe the result for input {case} using the current policy and revision."
     if observed is None:
-        kind, reason = "counterexample", f"Observe the result for input {case}."
+        kind, reason = "counterexample", probe_reason
     elif expected is None:
         kind, reason = "question", f"Observed {observed!r}; confirm the owner's expected result for {case}."
     elif observed == expected:
@@ -71,11 +87,11 @@ def route_comparison(comparison, actions):
     return eligible, reason
 
 
-def choose(context, actions, model, guided=True, on_model_call=None):
+def choose(context, actions, model, guided=True, on_model_call=None, *, fresh=False):
     prompt = make_prompt(context, actions, guided)
     reason = ""
     if guided:
-        actions, reason = route_comparison(context.get("comparison"), actions)
+        actions, reason = route_comparison(context.get("comparison"), actions, fresh=fresh)
         if len(actions) == 1:
             return {"id": actions[0]["id"], "reason": reason}
         prompt += ("\nEvidence gate: " + reason + " Select only among these IDs: "
@@ -105,6 +121,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("packet", type=Path)
     parser.add_argument("--model", required=True)
+    parser.add_argument("--fresh", action="store_true", help="caller just ran this input and checked current policy")
     args = parser.parse_args()
     packet = json.loads(args.packet.read_text())
-    print(json.dumps(choose(packet["context"], packet["actions"], args.model), ensure_ascii=False))
+    print(json.dumps(choose(packet["context"], packet["actions"], args.model, fresh=args.fresh), ensure_ascii=False))

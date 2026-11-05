@@ -361,28 +361,31 @@ def verify(root, state_name):
     if state['phase'] != 'editing':
         raise ReviewError('editing phase required')
     check, error = None, None
+    changed_files = state['proposal']['change_files']
+    state['phase'] = 'conflict'
     try:
         proposal_unchanged(root, state)
-        assert_hashes(root, {n: state['hashes'][n] for n in state['protected']})
+        assert_hashes(root, {n: h for n, h in state['hashes'].items() if n not in changed_files})
         c, protected = read_contract(root, state['contract'])
-        for n in c['editable_files']:
-            if n not in state['proposal']['change_files']:
-                assert_hashes(root, {n: state['hashes'][n]})
+        edited_hashes = snapshots(root, changed_files)
         check = run_checker(root, c, c['editable_files'] + protected)
+        proposal_unchanged(root, state)
+        assert_hashes(root, {**state['hashes'], **edited_hashes})
         if check['error']:
             raise ReviewError(check['error'])
-        if not check['report']['passed']:
-            raise ReviewError('checker reported failure')
+        if check['report']['passed']:
+            state['phase'] = 'verified'
+        else:
+            error = 'checker reported failure'
+            for name in changed_files:
+                original = state['originals'][name]
+                atomic_write(path(root, name), base64.b64decode(original['bytes_base64'], validate=True), original['mode'])
+            state['phase'] = 'rolled_back'
     except (ReviewError, OSError, ValueError, KeyError, TypeError) as exc:
         error = str(exc)
-    if error:
-        # All declared editable files are restored; a hostile symlink is not followed.
-        for n, original in state['originals'].items():
-            atomic_write(path(root, n, existing=False), base64.b64decode(original['bytes_base64'], validate=True), original['mode'])
-        state['phase'] = 'rolled_back'
-    else:
-        state['phase'] = 'verified'
-    state['verification'] = {'check': check, 'error': error, 'editable_hashes': snapshots(root, list(state['originals']))}
+    state['verification'] = {'check': check, 'error': error}
+    if state['phase'] != 'conflict':
+        state['verification']['editable_hashes'] = snapshots(root, list(state['originals']))
     save(sp, state)
     return {'state_id': state['id'], 'state_hash': state['state_hash'], 'phase': state['phase'], 'verification': state['verification']}
 
@@ -410,7 +413,7 @@ def main(argv=None):
         elif a.command == 'begin': result = begin(root, a.state)
         else: result = verify(root, a.state)
         print(json.dumps(result, ensure_ascii=False, allow_nan=False))
-        return 2 if result.get('phase') == 'rolled_back' else (1 if result.get('failure') else 0)
+        return 2 if result.get('phase') == 'rolled_back' else (1 if result.get('failure') or result.get('phase') == 'conflict' else 0)
     except (ReviewError, OSError, ValueError, KeyError, TypeError) as exc:
         print(json.dumps({'error': str(exc)}, ensure_ascii=False))
         return 1

@@ -280,7 +280,14 @@ def signature(path):
 
 
 def input_fingerprints(root, paths):
-    return {p: digest(safe_path(root, p)) if safe_path(root, p).is_file() else None for p in paths}
+    fingerprints = {}
+    for name in paths:
+        path = safe_path(root, name)
+        try:
+            fingerprints[name] = digest(path) if path.is_file() else None
+        except OSError:
+            fingerprints[name] = None
+    return fingerprints
 
 
 def optional_source_state(root, map_relative):
@@ -308,8 +315,17 @@ def run_evaluation(root, suite_relative, output_relative, selected, map_relative
             continue
         spec = case["expect"]
         inputs_before = input_fingerprints(root, case.get("inputs", []))
-        before = {item["path"]: signature(safe_path(root, item["path"])) for item in spec.get("files", [])}
         command = [sys.executable if token == "{python}" else token for token in case["command"]]
+        unavailable = [name for name, fingerprint in inputs_before.items() if fingerprint is None]
+        if unavailable:
+            results.append({"id": case["id"], "kind": case.get("kind", "unspecified"),
+                            "status": "failed", "executed": False, "returncode": None,
+                            "command": command, "duration_seconds": 0, "stdout": "", "stderr": "", "artifacts": [],
+                            "input_fingerprints": inputs_before, "inputs_declared": True,
+                            "inputs_changed_during_case": False,
+                            "failures": ["Missing or unreadable input: " + name for name in unavailable]})
+            continue
+        before = {item["path"]: signature(safe_path(root, item["path"])) for item in spec.get("files", [])}
         started = time.monotonic()
         failures = []
         stdout, stderr, returncode = "", "", None
@@ -344,7 +360,7 @@ def run_evaluation(root, suite_relative, output_relative, selected, map_relative
             failures.append("Declared input changed during this case")
         results.append({"id": case["id"], "kind": case.get("kind", "unspecified"),
                         "status": "failed" if failures else "passed", "returncode": returncode,
-                        "duration_seconds": round(time.monotonic() - started, 6), "command": command,
+                        "executed": True, "duration_seconds": round(time.monotonic() - started, 6), "command": command,
                         "stdout": stdout, "stderr": stderr, "failures": failures, "artifacts": artifacts,
                         "inputs_declared": bool(case.get("inputs")), "input_fingerprints": inputs_before,
                         "inputs_changed_during_case": inputs_changed})
@@ -352,16 +368,17 @@ def run_evaluation(root, suite_relative, output_relative, selected, map_relative
     source_changed = source_before != source_after
     suite_changed = digest(suite_path) != suite_sha
     failed = any(case["status"] == "failed" for case in results) or source_changed or suite_changed
+    executed = sum(case["executed"] for case in results)
     report = {"schema_version": 1, "status": "failed" if failed else "passed",
               "suite_sha256": suite_sha, "suite_changed_during_run": suite_changed,
-              "suite_case_count": len(suite["cases"]), "executed_case_count": len(results),
-              "all_cases_executed": len(results) == len(suite["cases"]),
+              "suite_case_count": len(suite["cases"]), "executed_case_count": executed,
+              "all_cases_executed": executed == len(suite["cases"]),
               "source_before": source_before, "source_changed_during_run": source_changed,
               "results": results}
     write_json(output_path, report)
     return {"status": report["status"], "report": output_path.relative_to(root).as_posix(),
             "all_cases_executed": report["all_cases_executed"],
-            "executed_case_count": len(results), "suite_case_count": len(suite["cases"]),
+            "executed_case_count": executed, "suite_case_count": len(suite["cases"]),
             "source_changed_during_run": source_changed, "suite_changed_during_run": suite_changed,
             "results": [{"id": c["id"], "status": c["status"], "failures": c["failures"]} for c in results]}, int(failed)
 

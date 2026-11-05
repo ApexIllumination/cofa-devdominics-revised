@@ -255,6 +255,19 @@ class Evaluations(ProjectTest):
                           "expect": {"returncode": 0}}])
         self.assertTrue(self.cli("eval", expected=1)["suite_changed_during_run"])
 
+    def test_missing_input_blocks_only_affected_case(self):
+        self.save_cases([
+            {"id": "missing", "command": ["{python}", "-c", "open('ran', 'w').close()"],
+             "inputs": ["absent.csv"], "expect": {"returncode": 0}},
+            {"id": "ready", "command": ["{python}", "-c", "pass"], "expect": {"returncode": 0}},
+        ])
+        report = self.cli("eval", expected=1)
+        self.assertFalse((self.root / "ran").exists())
+        self.assertEqual(report["executed_case_count"], 1)
+        self.assertFalse(report["all_cases_executed"])
+        self.assertIn("absent.csv", report["results"][0]["failures"][0])
+        self.assertEqual(report["results"][1]["status"], "passed")
+
     def test_declared_inputs_are_fingerprinted(self):
         self.make_suite()
         self.cli("eval", "--case", "normal")

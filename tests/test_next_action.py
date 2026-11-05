@@ -1,12 +1,14 @@
 import json
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import next_action
+from decision_log import append
 
 
 class NextActionTests(unittest.TestCase):
@@ -42,8 +44,32 @@ class NextActionTests(unittest.TestCase):
         for evidence, expected_id in tests:
             with self.subTest(evidence=evidence):
                 result = next_action.choose(
-                    {"comparison": dict(input_id="boundary", **evidence)}, actions, "unused")
+                    {"comparison": dict(input_id="boundary", **evidence)}, actions, "unused", fresh=True)
                 self.assertEqual(result["id"], expected_id)
+
+    def test_reused_pass_tracks_current_journal_instead_of_packet_values(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = str(Path(tmp) / "decisions.sqlite")
+            def record(event, kind, **detail):
+                append(db, "decision", event, kind, "tester", "fixture", detail)
+            record("hr1", "answer", answer="allow", rule_id="singleton")
+            record("v1", "verification", input_id="one", expected="allow", actual="allow",
+                   status="pass", runs=1, check_id="admit", revision="r1", answers={"singleton":"hr1"})
+            row = {"input_id":"one", "value":"allow", "source":"prior packet"}
+            comparison = {"input_id":"one", "observed":row, "expected":dict(row)}
+            options = self.actions + [dict(id=k, kind=k, label=k, input_id="one")
+                                      for k in ("proposal", "counterexample")]
+            def action():
+                return next_action.choose({"comparison":comparison}, options, "unused")["id"]
+            self.assertEqual(action(), "counterexample")
+            comparison["journal"] = dict(db=db, decision_id="decision", check_id="admit",
+                                         revision="r1", rules=["singleton"])
+            record("other", "answer", answer="blue", rule_id="color")
+            self.assertEqual(action(), "end")
+            record("hr2", "answer", answer="deny", rule_id="singleton")
+            self.assertEqual(action(), "counterexample")
+            comparison["expected"]["value"] = "deny"
+            self.assertEqual(action(), "counterexample")
 
     def test_no_matching_probe_stops_pending(self):
         actions = self.actions + [{"id":"other", "kind":"counterexample", "label":"x", "input_id":"other"}]
